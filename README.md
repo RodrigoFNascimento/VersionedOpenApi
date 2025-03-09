@@ -65,7 +65,8 @@ var group = versionedApi
 
 // Adds endpoints to the group
 group.MapGet("", () => new { version = "v1" })
-    .WithName("VersionReporterV1");
+    .WithName("VersionReporterV1")
+    .MapToApiVersion(1);
 
 group.MapGet("", () => new { version = "v2" })
     .WithName("VersionReporterV2")
@@ -99,6 +100,7 @@ using Microsoft.AspNetCore.Mvc;
 public class VersionController : ControllerBase
 {
     [HttpGet(Name = "VersionReporterV1")]
+    [MapToApiVersion(1)]
     public VersionResponse Get() => new("v1");
 
     [HttpGet(Name = "VersionReporterV2")]
@@ -109,11 +111,10 @@ public class VersionController : ControllerBase
 public sealed record VersionResponse(string Version);
 ```
 
+So we now have our API documentation available as a JSON, including our endpoints. Let's use it to make it available in not only a more human-readable format, but also make it easier to send requests to our API straight from the browser.
+
 ## Scalar
-
-[Scalar](https://scalar.com/) is not only going to make the OpenAPI documentation more human-readable, but also make it easier to send requests to our API straight from the browser.
-
-To add Scalar to a .NET web API, install the package `Scalar.AspNetCore`.
+To add [Scalar](https://scalar.com/), install the package `Scalar.AspNetCore`.
 
 ```
 dotnet add package Scalar.AspNetCore
@@ -129,4 +130,44 @@ if (app.Environment.IsDevelopment())
 }
 ```
 
-Scalar should now be available at "/scalar/v1" and "/scalar/v2".
+The Scalar endpoint should be accessible at "/scalar/v1" and "/scalar/v2".
+
+## Swagger
+To add [Swagger](https://swagger.io/), install the package `Swashbuckle.AspNetCore`.
+
+```
+dotnet add package Swashbuckle.AspNetCore
+```
+
+Use `AddSwaggerGen` to inject some services needed for the Swagger middleware.
+
+```csharp
+builder.Services.AddSwaggerGen();
+```
+
+Then use `UseSwagger` to register the Swagger middleware and `UseSwaggerUI` to tell Swagger to use the OpenAPI documentation in the provided path. `DescribeApiVersions` returns all the available versions, so we iterate over them, adding individual Swagger endpoints for each. This way, we don't need to declare them manually, which would be prone to errors.
+
+```csharp
+if (app.Environment.IsDevelopment())
+{
+    // Adds the OpenAPI documentation endpoint
+    app.MapOpenApi();
+    // Register the Swagger middleware
+    app.UseSwagger();
+    // Adds the Swagger page
+    app.UseSwaggerUI(options =>
+    {
+        // Adds a Swagger endpoint for each version
+        foreach (var description in app.DescribeApiVersions())
+        {
+            options.SwaggerEndpoint(
+                $"/openapi/{description.GroupName}.json",
+                description.GroupName);
+        }
+    });
+}
+```
+
+> :warning: In Minimal APIs, the endpoints need to be added **before** calling `DescribeApiVersions`, since it returns all versions added to `app`.
+
+The Swagger endpoint should be accessible at "/swagger".

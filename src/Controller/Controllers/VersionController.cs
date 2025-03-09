@@ -10,6 +10,7 @@ namespace Controller.Controllers;
 public class VersionController : ControllerBase
 {
     [HttpGet(Name = "VersionReporterV1")]
+    [MapToApiVersion(1)]
     public VersionResponse Get() => new("v1");
 
     [HttpGet(Name = "VersionReporterV2")]

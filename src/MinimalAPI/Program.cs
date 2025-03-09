@@ -24,16 +24,10 @@ builder.Services.AddApiVersioning()
         options.SubstituteApiVersionInUrl = true;
     });
 
+// Registers some services needed by the Swagger middleware
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    // Adds the OpenAPI documentation endpoint
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
-
-app.UseHttpsRedirection();
 
 // Creates a group of endpoints
 var group = app.NewVersionedApi()
@@ -44,10 +38,36 @@ var group = app.NewVersionedApi()
 
 // Adds endpoints to the group
 group.MapGet("", () => new { version = "v1" })
-    .WithName("VersionReporterV1");
+    .WithName("VersionReporterV1")
+    .MapToApiVersion(1);
 
 group.MapGet("", () => new { version = "v2" })
     .WithName("VersionReporterV2")
     .MapToApiVersion(2);
+
+if (app.Environment.IsDevelopment())
+{
+    // Adds the OpenAPI documentation endpoint
+    app.MapOpenApi();
+    // Adds the Scalar endpoint
+    app.MapScalarApiReference();
+    // Registers the Swagger middleware
+    app.UseSwagger();
+    // Adds the Swagger page
+    app.UseSwaggerUI(options =>
+    {
+        // Adds a Swagger endpoint for each version.
+        // DescribeApiVersions will only list all versions
+        // if called after the endpoints are added
+        foreach (var description in app.DescribeApiVersions())
+        {
+            options.SwaggerEndpoint(
+                $"/openapi/{description.GroupName}.json",
+                description.GroupName);
+        }
+    });
+}
+
+app.UseHttpsRedirection();
 
 app.Run();
