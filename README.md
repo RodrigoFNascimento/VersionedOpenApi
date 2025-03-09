@@ -73,3 +73,39 @@ group.MapGet("", () => new { version = "v2" })
 ```
 
 ### Controller
+`Program` should have support for controllers.
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+
+// ...
+
+app.MapControllers()
+    .WithOpenApi();
+```
+
+Now we need a controller with our endpoints. Let's use the same from our Minimal API example.
+
+```csharp
+using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
+
+[ApiController]
+[Route("v{version:apiVersion}/[controller]")]
+[ApiVersion(1)]
+[ApiVersion(2)]
+public class VersionController : ControllerBase
+{
+    [HttpGet(Name = "VersionReporterV1")]
+    public VersionResponse Get() => new("v1");
+
+    [HttpGet(Name = "VersionReporterV2")]
+    [MapToApiVersion(2)]
+    public VersionResponse GetV2() => new("v2");
+}
+
+public sealed record VersionResponse(string Version);
+```
+
