@@ -1,6 +1,8 @@
 # VersionedOpenApi
 An example of how to use OpenAPI to document .NET web APIs that have multiple endpoint versions.
 
+> :warning: **Disclaimer:** The content of this repository is focused *exclusively* on teaching how to add OpenAPI support to a .NET web API that has multiple endpoint versions. Anything beyond that scope is intentionally not present in order to make clear what is really necessary.
+
 ## OpenAPI
 To add OpenAPI support to our web API, we first need to add the package `Microsoft.AspNetCore.OpenApi`.
 
