@@ -4,7 +4,7 @@ An example of how to use OpenAPI to document .NET web APIs that have multiple en
 ## OpenAPI
 To add OpenAPI support to our web API, we first need to add the package `Microsoft.AspNetCore.OpenApi`.
 
-```csharp
+```
 dotnet add package Microsoft.AspNetCore.OpenApi
 ```
 
@@ -47,7 +47,7 @@ if (app.Environment.IsDevelopment())
 }
 ```
 
-All we need now are endpoints!
+The documentation should now be available at "/openapi/v1.json" and "/openapi/v2.json". All we need now are endpoints!
 
 ### Minimal API
 Let's add an endpoint that returns it's version, either v1 or v2.
@@ -109,3 +109,24 @@ public class VersionController : ControllerBase
 public sealed record VersionResponse(string Version);
 ```
 
+## Scalar
+
+[Scalar](https://scalar.com/) is not only going to make the OpenAPI documentation more human-readable, but also make it easier to send requests to our API straight from the browser.
+
+To add Scalar to a .NET web API, install the package `Scalar.AspNetCore`.
+
+```
+dotnet add package Scalar.AspNetCore
+```
+
+Then add it to the API using `MapScalarApiReference`.
+
+```csharp
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
+```
+
+Scalar should now be available at "/scalar/v1" and "/scalar/v2".

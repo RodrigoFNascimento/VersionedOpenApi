@@ -1,3 +1,5 @@
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -28,6 +30,7 @@ if (app.Environment.IsDevelopment())
 {
     // Adds the OpenAPI documentation endpoint
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
