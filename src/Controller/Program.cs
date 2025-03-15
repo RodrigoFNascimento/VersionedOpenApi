@@ -8,7 +8,7 @@ builder.Services.AddControllers();
 // Generates OpenAPI documents for each endpoint version
 // The version is the document name
 builder.Services
-    .AddOpenApi("v1")
+    .AddOpenApi()
     .AddOpenApi("v2");
 
 // Adds support to versioning to the API
@@ -53,7 +53,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapControllers()
-    .WithOpenApi();
+app.MapControllers();
 
 app.Run();

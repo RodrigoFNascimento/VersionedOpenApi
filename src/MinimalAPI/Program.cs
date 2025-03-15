@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Generates OpenAPI documents for each endpoint version
 // The version is the document name
 builder.Services
-    .AddOpenApi("v1")
+    .AddOpenApi()
     .AddOpenApi("v2");
 
 // Adds support to versioning to the API
@@ -33,8 +33,7 @@ var app = builder.Build();
 var group = app.NewVersionedApi()
     .MapGroup("v{version:apiVersion}/version")
     .HasApiVersion(1)
-    .HasApiVersion(2)
-    .WithOpenApi();
+    .HasApiVersion(2);
 
 // Adds endpoints to the group
 group.MapGet("", () => new { version = "v1" })

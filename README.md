@@ -16,7 +16,7 @@ Our API is going to have v1 and v2 endpoints, so we use `AddOpenApi` in `Program
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
-    .AddOpenApi("v1")
+    .AddOpenApi()
     .AddOpenApi("v2");
 ```
 
@@ -62,8 +62,7 @@ var versionedApi = app.NewVersionedApi();
 var group = versionedApi
     .MapGroup("v{version:apiVersion}/version")
     .HasApiVersion(1)
-    .HasApiVersion(2)
-    .WithOpenApi();
+    .HasApiVersion(2);
 
 // Adds endpoints to the group
 group.MapGet("", () => new { version = "v1" })
@@ -85,8 +84,7 @@ builder.Services.AddControllers();
 
 // ...
 
-app.MapControllers()
-    .WithOpenApi();
+app.MapControllers();
 ```
 
 Now we need a controller with our endpoints. Let's use the same from our Minimal API example.
