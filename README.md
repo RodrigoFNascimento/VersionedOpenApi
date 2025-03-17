@@ -65,13 +65,17 @@ var group = versionedApi
     .HasApiVersion(2);
 
 // Adds endpoints to the group
-group.MapGet("", () => new { version = "v1" })
+group.MapGet("", () => new VersionResponse("v1"))
     .WithName("VersionReporterV1")
     .MapToApiVersion(1);
 
-group.MapGet("", () => new { version = "v2" })
+group.MapGet("", () => new VersionResponse("v2"))
     .WithName("VersionReporterV2")
     .MapToApiVersion(2);
+
+// ...
+
+public sealed record VersionResponse(string Version);
 ```
 
 ### Controller

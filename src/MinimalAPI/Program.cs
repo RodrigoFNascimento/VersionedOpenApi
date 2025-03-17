@@ -36,11 +36,11 @@ var group = app.NewVersionedApi()
     .HasApiVersion(2);
 
 // Adds endpoints to the group
-group.MapGet("", () => new { version = "v1" })
+group.MapGet("", () => new VersionResponse("v1"))
     .WithName("VersionReporterV1")
     .MapToApiVersion(1);
 
-group.MapGet("", () => new { version = "v2" })
+group.MapGet("", () => new VersionResponse("v2"))
     .WithName("VersionReporterV2")
     .MapToApiVersion(2);
 
@@ -70,3 +70,5 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.Run();
+
+public sealed record VersionResponse(string Version);
