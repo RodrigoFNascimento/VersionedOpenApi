@@ -44,28 +44,25 @@ group.MapGet("", () => new VersionResponse("v2"))
     .WithName("VersionReporterV2")
     .MapToApiVersion(2);
 
-if (app.Environment.IsDevelopment())
+// Adds the OpenAPI documentation endpoint
+app.MapOpenApi();
+// Adds the Scalar endpoint
+app.MapScalarApiReference();
+// Registers the Swagger middleware
+app.UseSwagger();
+// Adds the Swagger page
+app.UseSwaggerUI(options =>
 {
-    // Adds the OpenAPI documentation endpoint
-    app.MapOpenApi();
-    // Adds the Scalar endpoint
-    app.MapScalarApiReference();
-    // Registers the Swagger middleware
-    app.UseSwagger();
-    // Adds the Swagger page
-    app.UseSwaggerUI(options =>
+    // Adds a Swagger endpoint for each version.
+    // DescribeApiVersions will only list all versions
+    // if called after the endpoints are added
+    foreach (var description in app.DescribeApiVersions())
     {
-        // Adds a Swagger endpoint for each version.
-        // DescribeApiVersions will only list all versions
-        // if called after the endpoints are added
-        foreach (var description in app.DescribeApiVersions())
-        {
-            options.SwaggerEndpoint(
-                $"/openapi/{description.GroupName}.json",
-                description.GroupName);
-        }
-    });
-}
+        options.SwaggerEndpoint(
+            $"/openapi/{description.GroupName}.json",
+            description.GroupName);
+    }
+});
 
 app.UseHttpsRedirection();
 

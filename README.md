@@ -42,11 +42,8 @@ Now we use `MapOpenApi` to add an endpoint where the OpenAPI documentation will 
 ```csharp
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    // Adds the OpenAPI documentation endpoint
-    app.MapOpenApi();
-}
+// Adds the OpenAPI documentation endpoint
+app.MapOpenApi();
 ```
 
 The documentation should now be available at "/openapi/v1.json" and "/openapi/v2.json". All we need now are endpoints!
@@ -127,11 +124,10 @@ dotnet add package Scalar.AspNetCore
 Then add it to the API using `MapScalarApiReference`.
 
 ```csharp
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
+// Adds the OpenAPI documentation endpoint
+app.MapOpenApi();
+// Adds the Scalar endpoint
+app.MapScalarApiReference();
 ```
 
 The Scalar endpoint should be accessible at "/scalar/v1" and "/scalar/v2".
@@ -152,24 +148,21 @@ builder.Services.AddSwaggerGen();
 Then use `UseSwagger` to register the Swagger middleware and `UseSwaggerUI` to tell Swagger to use the OpenAPI documentation in the provided path. `DescribeApiVersions` returns all the available versions, so we iterate over them, adding individual Swagger endpoints for each. This way, we don't need to declare them manually, which would be prone to errors.
 
 ```csharp
-if (app.Environment.IsDevelopment())
+// Adds the OpenAPI documentation endpoint
+app.MapOpenApi();
+// Register the Swagger middleware
+app.UseSwagger();
+// Adds the Swagger page
+app.UseSwaggerUI(options =>
 {
-    // Adds the OpenAPI documentation endpoint
-    app.MapOpenApi();
-    // Register the Swagger middleware
-    app.UseSwagger();
-    // Adds the Swagger page
-    app.UseSwaggerUI(options =>
+    // Adds a Swagger endpoint for each version
+    foreach (var description in app.DescribeApiVersions())
     {
-        // Adds a Swagger endpoint for each version
-        foreach (var description in app.DescribeApiVersions())
-        {
-            options.SwaggerEndpoint(
-                $"/openapi/{description.GroupName}.json",
-                description.GroupName);
-        }
-    });
-}
+        options.SwaggerEndpoint(
+            $"/openapi/{description.GroupName}.json",
+            description.GroupName);
+    }
+});
 ```
 
 > :warning: In Minimal APIs, the endpoints need to be added **before** calling `DescribeApiVersions`, since it returns all versions added to `app`.
