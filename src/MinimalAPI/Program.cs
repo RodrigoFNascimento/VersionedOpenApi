@@ -56,11 +56,12 @@ app.UseSwaggerUI(options =>
     // Adds a Swagger endpoint for each version.
     // DescribeApiVersions will only list all versions
     // if called after the endpoints are added
-    foreach (var description in app.DescribeApiVersions())
+    foreach (var groupName in app.DescribeApiVersions()
+        .Select(description => description.GroupName))
     {
         options.SwaggerEndpoint(
-            $"/openapi/{description.GroupName}.json",
-            description.GroupName);
+            $"/openapi/{groupName}.json",
+            groupName);
     }
 });
 
